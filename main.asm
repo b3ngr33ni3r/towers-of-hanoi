@@ -17,6 +17,8 @@ menuOption2 db '5 Rings',0
 menuOption3 db '7 Rings',0
 menuColorArray db 4,2 DUP(15)
 
+ringArray db 20 DUP(15)
+
 .code
 main PROC
 
@@ -215,8 +217,104 @@ showMenu ENDP
 ; renders the game
 ; takes al = ringcount
 showGame PROC
+	mov eax,0
+	mov al,15
+	call settextcolor
 	call clrscr
+	call makePoles
+	call makeAllBlocks
 	ret
 showGame ENDP
+
+
+makeAllBlocks PROC
+	; al = 3 | 5 | 7
+
+	ret
+makeAllBlocks ENDP
+
+;creates the 3 poles to hold the "RINGS"
+makePoles PROC
+	mov dl, 0
+	mov dh, 0
+	mov ecx, 3; #of poles to generate
+	DaBigLoop:
+		push ecx
+	
+		add dl, 10
+		add dh, 5
+		mov al, 186; Vertical pole character
+		mov ecx, 16; Vertical pole length
+		L2:
+			call gotoxy
+			call writechar
+			inc dh
+		loop L2
+	
+		sub dl, 11; Horizontal pole holder start position
+		mov al, 205
+		mov ecx, 7
+		L3:
+			call gotoxy
+			inc dl
+		loop L3
+		add dl, 1
+		mov ecx, 7
+		L4:
+			call gotoxy
+			call writechar
+			inc dl
+		loop L4
+		add dl, 5
+		sub dh, 15
+		pop ecx
+		loop DaBigLoop
+	ret
+makePoles ENDP
+
+
+; takes bl = diameter
+; dh = top left y
+; dl = top left x
+; renders a block
+makeBlock proc uses ecx
+	;Offests block length. Goes to specified spot
+	sub bl, 2
+	call gotoxy
+	;Top left corner
+	mov al, 201
+	call writechar
+	mov cl, bl
+	L:
+		;top line of block
+		mov al, 209
+		call writechar
+	Loop L
+	;top right corner
+	mov al, 187
+	call writechar
+	call crlf
+	
+	push edx
+	add dh, 1
+	call gotoxy
+	pop edx
+	
+	;Bottom left corner
+	mov al, 200
+	call writechar
+	
+	mov cl, bl
+	L2:
+		;bottom line of block
+		mov al, 207
+		call writechar
+	Loop L2
+	;bottom right corner
+	mov al, 188
+	call writechar
+	call crlf
+ret
+makeBlock endp
 
 END main
